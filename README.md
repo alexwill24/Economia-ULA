@@ -2,7 +2,7 @@
 
 Repositorio compilador de trabajos, análisis y código desarrollado durante mi carrera en **Licenciatura en Ciencias Económicas** en la Universidad de Los Andes (ULA).
 
-Aquí encontrarás proyectos de econometría, análisis de series temporales, análisis de datos y estudios económicos cuantitativos utilizando **R, Python y Stata**.
+Aquí encontrarás proyectos de econometría, análisis de series temporales, análisis de datos y estudios económicos cuantitativos utilizando **R, Python, Power Bi y STATA**.
 
 ---
 
