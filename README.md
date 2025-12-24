@@ -1,177 +1,182 @@
-# Análisis Económico - ULA 📊
+# 📊 Portafolio de Análisis Econométricos en R
 
-Repositorio compilador de trabajos, análisis y código desarrollado durante mi carrera en **Licenciatura en Ciencias Económicas** en la Universidad de Los Andes (ULA).
+[![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
+[![RStudio](https://img.shields.io/badge/RStudio-75AADB?style=for-the-badge&logo=RStudio&logoColor=white)](https://www.rstudio.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-Aquí encontrarás proyectos de econometría, análisis de series temporales, análisis de datos y estudios económicos cuantitativos utilizando **R, Python y Stata**.
+Colección de análisis econométricos y trabajos desarrollados en R durante mi carrera de Economía en la Universidad de Los Andes (ULA), Venezuela.
+
+## 👨‍💼 Autor
+
+**William Gutierrez**  
+Economista | Analista de Datos | Universidad de Los Andes  
+📧 gutalex2014@gmail.com  
+🔗 [LinkedIn](https://linkedin.com/in/ecoanalisiswill) | [RPubs](https://rpubs.com/WILLIAM_25) | [Portafolio](https://gutalex2014.wixsite.com/portafolio-william-g)
 
 ---
 
-## 📁 Estructura del Repositorio
+## 📂 Contenido del Repositorio
 
+### 🔹 [01 - Series Temporales: Economía Argentina](./01-series-temporales-argentina/)
+
+Análisis exhaustivo de series económicas argentinas utilizando modelos ARIMA y técnicas de descomposición.
+
+**Proyectos incluidos:**
+- **Modelado ARIMA de Inflación**: Análisis estocástico de la inflación mensual (1970-2025)
+- **Tasa de Interés Efectiva**: Modelos determinísticos y trigonométricos
+- **Pruebas de Estacionariedad**: Test ADF, análisis ACF/PACF
+
+**Técnicas aplicadas:**
+- Series de Tiempo ARIMA(p,d,q)
+- Descomposición STL (Seasonal-Trend-Loess)
+- Modelos determinísticos (regresión dicotómica y trigonométrica)
+- Pruebas de raíz unitaria (Augmented Dickey-Fuller)
+- Validación de modelos (Ljung-Box, Shapiro-Wilk)
+
+**Herramientas:** `forecast`, `tseries`, `ggplot2`, `TSA`, `lmtest`
+
+📊 **Ver análisis publicados:**
+- [Series ARIMA - RPubs](http://rpubs.com/WILLIAM_25/1380982)
+- [Política Monetaria Argentina - RPubs](http://rpubs.com/WILLIAM_25/1380989)
+
+---
+
+### 🔹 [02 - Pirámides Poblacionales Comparativas](./02-piramides-poblacionales/)
+
+Análisis demográfico y visualización de estructuras etarias en diferentes regiones.
+
+**Regiones analizadas:**
+- Europa del Sur (España, Italia, Grecia)
+- El Caribe (Cuba, República Dominicana, Puerto Rico)
+- El Cáucaso (Georgia, Armenia, Azerbaiyán)
+
+**Técnicas aplicadas:**
+- Visualización de datos demográficos
+- Análisis comparativo de estructuras poblacionales
+- Interpretación de pirámides etarias
+
+**Herramientas:** `ggplot2`, `dplyr`, `tidyr`
+
+📊 **Ver análisis:** [Pirámides Poblacionales - RPubs](http://rpubs.com/WILLIAM_25/1380940)
+
+---
+
+### 🔹 [03 - Otros Análisis Econométricos](./03-otros-analisis/)
+
+Proyectos adicionales y análisis exploratorios (en desarrollo).
+
+---
+
+## 🛠️ Stack Tecnológico
+
+### Lenguajes y Entornos
+- **R** (4.x): Lenguaje principal
+- **RStudio**: IDE de desarrollo
+- **R Markdown**: Documentación reproducible
+
+### Librerías Principales
+
+**Análisis de Series Temporales:**
+```r
+library(forecast)     # Modelado ARIMA y pronósticos
+library(tseries)      # Tests de estacionariedad
+library(TSA)          # Análisis de series temporales
+library(stl)          # Descomposición STL
 ```
-Economia-ULA/
-├── 01-series-temporales-argentina/    # Análisis ARIMA e inflación
-├── 02-modelos-binarios/               # Modelos Probit y Logit
-├── 03-analisis-rpubs/                 # Proyectos publicados en RPubs
-├── 04-datos-panel/                    # Efectos fijos y aleatorios
-└── README.md                          # Este archivo
+
+**Manipulación y Visualización:**
+```r
+library(tidyverse)    # Ecosistema de análisis de datos
+library(ggplot2)      # Visualización avanzada
+library(dplyr)        # Manipulación de datos
+library(readxl)       # Lectura de archivos Excel
+```
+
+**Análisis Estadístico:**
+```r
+library(lmtest)       # Tests de modelos lineales
+library(nortest)      # Tests de normalidad
+library(stats)        # Funciones estadísticas base
 ```
 
 ---
 
-## 🔬 **Proyectos Destacados**
+## 📖 Metodología de Trabajo
 
-### 1. **Modelos Probit y Logit - Análisis de Discriminación en Préstamos Hipotecarios**
+Todos los análisis en este repositorio siguen un flujo estructurado:
 
-**Descripción:**  
-Análisis econométrico sobre aprobación de préstamos hipotecarios utilizando el dataset `loanapp` de Wooldridge. Se estimaron modelos **Probit y Logit** para evaluar evidencia de discriminación racial en el otorgamiento de crédito.
-
-**Metodología:**
-- Modelos de probabilidad no lineal (Probit y Logit)
-- Cálculo de efectos marginales promedio (AME)
-- Análisis de probabilidades predichas contrafactuales
-- Estimación de efectos discriminativos según ec. (17. 17) de Wooldridge
-
-**Principales hallazgos:**
-- Efecto discriminativo estimado: **~10 puntos porcentuales**
-- Ser blanco aumenta la probabilidad de aprobación en 8.64% (Probit) vs 8.28% (Logit)
-- Robustez entre modelos Probit y Logit confirma el sesgo racial
-
-**Archivos:**
-- `Modelo Probit y Logit Econometría aplicada. Rmd` - Análisis completo con interpretación
-- `analisis_probit_logit.html` - Reporte compilado interactivo
-
-**Leer:**  
-📄 [Ver análisis completo](./02-modelos-binarios/analisis-probit-logit.html)
+1. **Importación de Datos**: Lectura desde Excel/CSV
+2. **Exploración Inicial**: Visualización y estadísticas descriptivas
+3. **Preparación**: Limpieza y transformación de datos
+4. **Modelado**: Aplicación de técnicas econométricas
+5. **Validación**: Pruebas diagnósticas y estadísticas
+6. **Visualización**: Gráficos profesionales con ggplot2
+7. **Documentación**: Reportes reproducibles en R Markdown
 
 ---
 
-### 2. **Series de Tiempo - Inflación en Argentina (1970-2024)**
+## 🚀 Cómo Usar Este Repositorio
 
-**Descripción:**  
-Análisis estocástico de series de tiempo de inflación en Argentina empleando metodología ARIMA. Se evalúan componentes determinísticos y estocásticos de la inflación mensual.
+### Clonar el repositorio:
+```bash
+git clone https://github.com/alexwill24/Economia-ULA.git
+cd Economia-ULA
+```
 
-**Archivos:**
-- `Analisis de serie de tiempo estocastica de Argentina Tarea 4 final. Rmd`
-- `Primer modelo deterministico Inflación mensual Argentina.R`
-- `Analisis de serie de tiempo estocastica de Argentina de inflación 1970 al 2024.pdf`
+### Instalar dependencias:
+```r
+# Instalar todas las librerías necesarias
+install.packages(c(
+  "forecast", "tseries", "TSA", "ggplot2", 
+  "dplyr", "readxl", "lmtest", "tidyverse"
+))
+```
 
----
-
-### 3. **Tasa de Interés Efectiva - Política Monetaria Argentina**
-
-**Descripción:**  
-Análisis de la evolución de tasas de interés efectivas bajo política monetaria en Argentina.  Incluye modelaje determinístico de la tasa efectiva de la política monetaria.
-
-**Archivos:**
-- `Segundo modelo de series de tiempo deterministico Tasa de interes efectiva de la politica monetaria Argentina.R`
-
-**También publicado en RPubs:**  
-📊 [Tasa de Interés Efectiva de Argentina](http://rpubs.com/WILLIAM_25/1380989)
-
----
-
-### 4. **Proyectos Publicados en RPubs**
-
-Tengo varios análisis econométricos y estadísticos publicados en RPubs:
-
-| Análisis | Descripción | Link |
-|----------|-------------|------|
-| **Tasa de Interés Efectiva Argentina** | Análisis de política monetaria y tasas efectivas | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380989) |
-| **Indicadores Económicos Argentina** | Múltiples análisis de variables macroeconómicas | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380982) |
-| **Análisis Financiero y Económico** | Estudios cuantitativos adicionales | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380940) |
-| **Análisis Complementario** | Otros análisis de interés | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1352257) |
+### Ejecutar un análisis:
+```r
+# Ejemplo: Análisis ARIMA de inflación argentina
+setwd("01-series-temporales-argentina")
+source("analisis-inflacion-arima-final.Rmd")
+```
 
 ---
 
-### 5. **Tesis de Grado:  Agendas Concretas de Acción**
+## 📊 Proyectos Destacados
 
-**Título:**  
-_"Correlación entre nudos críticos y proyectos en las Agendas Concretas de Acción:  Un análisis cuantitativo de la planificación comunal en Mérida (2019-2025)"_
+### 🏆 Análisis de Inflación Argentina con ARIMA
+- **Periodo:** 1970-2025 (datos mensuales)
+- **Modelo óptimo:** ARIMA(5,1,4) seleccionado por criterios AIC/BIC
+- **Validación:** Pruebas de Ljung-Box y Shapiro-Wilk
+- **Pronóstico:** 100 periodos adelante con IC 95%
 
-**Descripción:**  
-Análisis econométrico cuantitativo de planificación comunal en Mérida, Venezuela. Se evaluó la correlación entre nudos críticos identificados y proyectos propuestos en las Agendas Concretas de Acción.
-
-**Resultados:**
-- Calificación: **19/20**
-- GPA final: **16.31/20** (_Cum Laude_)
-- Código y análisis reproducibles disponibles en GitHub
-
-**Repositorio:**  
-🔗 [Monografía - Análisis ACA Mérida](https://github.com/alexwill24/monografia-analisis-aca-merida)
+**Resultados clave:**
+- Test ADF: Serie estacionaria tras diferenciación (p < 0.05)
+- MAPE: Precisión aceptable con ajuste robusto
+- ACF1 ≈ 0: Sin autocorrelación residual
 
 ---
 
-## 🛠️ **Tecnologías y Herramientas**
+## 📚 Recursos Adicionales
 
-| Tecnología | Uso |
-|------------|-----|
-| **R** | Análisis estadístico, visualización, econometría |
-| **Python** | Análisis de datos, machine learning |
-| **Stata** | Regresiones y análisis econométrico |
-| **R Markdown** | Reportes reproducibles |
-| **Typst** | Documentación técnica |
-| **Git/GitHub** | Control de versiones |
+- **Tesis de Grado:** [Análisis Cuantitativo ACA Mérida](https://github.com/alexwill24/monografia-analisis-aca-merida)
+- **Publicaciones RPubs:** [Perfil completo](https://rpubs.com/WILLIAM_25)
+- **Portafolio Web:** [Proyectos y CV](https://gutalex2014.wixsite.com/portafolio-william-g)
 
 ---
 
-## 📚 **Habilidades Técnicas Demostradas**
+## 📜 Licencia
 
-✅ **Modelado Econométrico:**
-- Modelos lineales (MCO, regresión múltiple)
-- Modelos no lineales (Probit, Logit, Tobit)
-- Series de tiempo (ARIMA, VAR)
-- Datos de panel (efectos fijos y aleatorios)
-
-✅ **Análisis de Datos:**
-- Análisis exploratorio (EDA)
-- Visualización de datos
-- Inferencia estadística
-- Pruebas de hipótesis
-
-✅ **Reproducibilidad:**
-- Reportes dinámicos en R Markdown
-- Análisis reproducibles
-- Documentación técnica clara
+Este repositorio está bajo la Licencia MIT. Puedes usar, modificar y distribuir el código citando la fuente original.
 
 ---
 
-## 📊 **Mi Perfil**
+## 📬 Contacto
 
-**Economista** especializado en análisis de datos e investigación económica cuantitativa. 
+¿Tienes preguntas o sugerencias sobre algún análisis?
 
-- 🎓 Licenciado en Ciencias Económicas (ULA) - _Cum Laude_
-- 📈 Especialista en econometría aplicada y análisis de datos
-- 🔧 Proficiente en R, Python, Stata y herramientas estadísticas
-- 📝 Experiencia en investigación económica y modelaje matemático
-
-**Intereses:**
-- Econometría aplicada
-- Ciencia de datos
-- Análisis de políticas públicas
-- Evaluación de proyectos
-- Modelaje estadístico
-
----
-
-## 📞 **Contacto**
-
-- 📧 Email: [gutalex2014@gmail.com](mailto:gutalex2014@gmail.com)
-- 🔗 GitHub: [@alexwill24](https://github.com/alexwill24)
-- 💼 LinkedIn: [ecoanalisiswill](https://linkedin.com/in/ecoanalisiswill)
-- 🌐 Portafolio: [gutalex2014.wixsite.com/portafolio-william-g](https://gutalex2014.wixsite.com/portafolio-william-g)
-
----
-
-## 📝 **Licencia**
-
-Estos trabajos son de carácter académico.  Se distribuyen bajo licencia [MIT](LICENSE) con fines educativos. 
-
----
-
-**Última actualización:** Diciembre 2025  
-**Versión:** 1.0
-
+📧 **Email:** gutalex2014@gmail.com  
+💼 **LinkedIn:** [ecoanalisiswill](https://linkedin.com/in/ecoanalisiswill)  
+🐙 **GitHub:** [@alexwill24](https://github.com/alexwill24)
 
 ---
 
