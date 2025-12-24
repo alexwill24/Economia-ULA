@@ -1,279 +1,173 @@
-# 📈 Análisis de Series Temporales: Economía Argentina
+# Análisis Económico - ULA 📊
 
-Análisis econométrico exhaustivo de indicadores económicos argentinos utilizando modelos ARIMA y técnicas de descomposición temporal.
+Repositorio compilador de trabajos, análisis y código desarrollado durante mi carrera en **Licenciatura en Ciencias Económicas** en la Universidad de Los Andes (ULA).
+
+Aquí encontrarás proyectos de econometría, análisis de series temporales, análisis de datos y estudios económicos cuantitativos utilizando **R, Python y Stata**.
 
 ---
 
-## 📂 Contenido del Proyecto
-
-### Archivos Principales
-
-| Archivo | Descripción | Tipo |
-|---------|-------------|------|
-| `analisis-inflacion-arima-final.Rmd` | Modelo ARIMA completo de inflación mensual | R Markdown |
-| `analisis-inflacion-arima.Rmd` | Versión preliminar del análisis ARIMA | R Markdown |
-| `modelo-deterministico-inflacion.R` | Modelos determinísticos (dicotómico/trigonométrico) | R Script |
-| `modelo-deterministico-tasa-interes.R` | Análisis de tasa de interés efectiva | R Script |
-| `significancia-individual.R` | Pruebas de significancia de parámetros | R Script |
-
-### Estructura de Carpetas
+## 📁 Estructura del Repositorio
 
 ```
-01-series-temporales-argentina/
-├── README.md (este archivo)
-├── analisis-inflacion-arima-final.Rmd
-├── analisis-inflacion-arima.Rmd
-├── modelo-deterministico-inflacion.R
-├── modelo-deterministico-tasa-interes.R
-├── significancia-individual.R
-├── data/
-│   ├── datos-series-tiempo-argentina.xlsx
-│   └── tasa-interes-efectiva-argentina.xlsx
-└── outputs/
-    ├── graficos/
-    └── resultados/
+Econom-a-ULA/
+├── 01-series-temporales-argentina/    # Análisis ARIMA e inflación
+├── 02-modelos-binarios/               # Modelos Probit y Logit
+├── 03-analisis-rpubs/                 # Proyectos publicados en RPubs
+├── 04-datos-panel/                    # Efectos fijos y aleatorios
+└── README.md                          # Este archivo
 ```
 
 ---
 
-## 🎯 Objetivos del Análisis
+## 🔬 **Proyectos Destacados**
 
-1. **Modelar la inflación argentina** (1970-2025) usando metodología Box-Jenkins
-2. **Analizar tasas de interés efectivas** de política monetaria
-3. **Comparar modelos determinísticos vs estocásticos**
-4. **Generar pronósticos** con intervalos de confianza
-5. **Validar supuestos** de los modelos econométricos
+### 1. **Modelos Probit y Logit - Análisis de Discriminación en Préstamos Hipotecarios**
 
----
+**Descripción:**  
+Análisis econométrico sobre aprobación de préstamos hipotecarios utilizando el dataset `loanapp` de Wooldridge. Se estimaron modelos **Probit y Logit** para evaluar evidencia de discriminación racial en el otorgamiento de crédito.
 
-## 🔬 Metodología
+**Metodología:**
+- Modelos de probabilidad no lineal (Probit y Logit)
+- Cálculo de efectos marginales promedio (AME)
+- Análisis de probabilidades predichas contrafactuales
+- Estimación de efectos discriminativos según ec. (17. 17) de Wooldridge
 
-### 1. Análisis ARIMA (Box-Jenkins)
+**Principales hallazgos:**
+- Efecto discriminativo estimado: **~10 puntos porcentuales**
+- Ser blanco aumenta la probabilidad de aprobación en 8.64% (Probit) vs 8.28% (Logit)
+- Robustez entre modelos Probit y Logit confirma el sesgo racial
 
-**Pasos implementados:**
+**Archivos:**
+- `Modelo Probit y Logit Econometría aplicada. Rmd` - Análisis completo con interpretación
+- `analisis_probit_logit.html` - Reporte compilado interactivo
 
-**A. Identificación**
-- Visualización de la serie original
-- Prueba de estacionariedad (Test ADF)
-- Análisis de autocorrelaciones (ACF/PACF)
-- Diferenciación de la serie (si es necesario)
-
-**B. Estimación**
-- Selección automática de orden ARIMA(p,d,q)
-- Criterios de información: AIC, BIC
-- Estimación de parámetros por máxima verosimilitud
-
-**C. Validación**
-- Test de Ljung-Box (autocorrelación residual)
-- Test de Shapiro-Wilk (normalidad de residuos)
-- Análisis de residuos estandarizados
-
-**D. Pronóstico**
-- Proyección h periodos adelante
-- Intervalos de confianza al 95%
-
-### 2. Modelos Determinísticos
-
-**Técnicas aplicadas:**
-
-**Descomposición Clásica:**
-- Multiplicativa: Y_t = T_t × S_t × I_t
-- Aditiva: Y_t = T_t + S_t + I_t
-
-**Descomposición STL:**
-- Seasonal-Trend decomposition using Loess
-- Robusta a outliers
-
-**Regresión con Variables Estacionales:**
-- Dicotómica: Variables dummy mensuales
-- Trigonométrica: Funciones seno/coseno
-- Combinaciones de tendencia + estacionalidad
+**Leer:**  
+📄 [Ver análisis completo](./02-modelos-binarios/analisis-probit-logit.html)
 
 ---
 
-## 📊 Resultados Principales
+### 2. **Series de Tiempo - Inflación en Argentina (1970-2024)**
 
-### Análisis de Inflación Mensual Argentina
+**Descripción:**  
+Análisis estocástico de series de tiempo de inflación en Argentina empleando metodología ARIMA. Se evalúan componentes determinísticos y estocásticos de la inflación mensual.
 
-**Serie analizada:**
-- Periodo: Julio 1970 - Actualidad
-- Frecuencia: Mensual
-- Observaciones: 600+ datos
-
-**Modelo óptimo seleccionado: ARIMA(5,1,4)**
-
-**Prueba de Estacionariedad:**
-```
-Test ADF (serie diferenciada):
-H0: Serie no estacionaria
-p-value < 0.05 → Rechazamos H0
-Conclusión: Serie es estacionaria tras una diferenciación
-```
-
-**Métricas de Ajuste:**
-| Métrica | Valor | Interpretación |
-|---------|-------|----------------|
-| ME | ≈ 0 | Sin sesgo sistemático |
-| RMSE | Bajo | Buen ajuste global |
-| MAE | Bajo | Error absoluto aceptable |
-| MAPE | Alto | Posibles outliers |
-| MASE | < 1 | Mejor que modelo naive |
-| ACF1 | ≈ 0 | Sin autocorrelación residual |
-
-**Pronóstico:**
-- Horizonte: 100 meses adelante
-- Intervalo de confianza: 95%
-- Validado con pruebas diagnósticas
-
-### Análisis de Tasa de Interés Efectiva
-
-**Modelos comparados:**
-1. Descomposición multiplicativa/aditiva
-2. Regresión dicotómica (medias estacionales)
-3. Regresión trigonométrica (armónicos)
-4. Modelo sinusoidal completo
-
-**Comparación de MSE/MAE:**
-- Modelo sinusoidal mostró mejor ajuste
-- Criterios AIC/BIC confirman parsimonia
+**Archivos:**
+- `Analisis de serie de tiempo estocastica de Argentina Tarea 4 final. Rmd`
+- `Primer modelo deterministico Inflación mensual Argentina.R`
+- `Analisis de serie de tiempo estocastica de Argentina de inflación 1970 al 2024.pdf`
 
 ---
 
-## 🛠️ Librerías Utilizadas
+### 3. **Tasa de Interés Efectiva - Política Monetaria Argentina**
 
-```r
-# Análisis de series temporales
-library(forecast)      # Modelado ARIMA y pronósticos
-library(tseries)       # Pruebas de estacionariedad
-library(TSA)           # Time Series Analysis
+**Descripción:**  
+Análisis de la evolución de tasas de interés efectivas bajo política monetaria en Argentina.  Incluye modelaje determinístico de la tasa efectiva de la política monetaria.
 
-# Visualización
-library(ggplot2)       # Gráficos avanzados
-library(plotly)        # Gráficos interactivos
+**Archivos:**
+- `Segundo modelo de series de tiempo deterministico Tasa de interes efectiva de la politica monetaria Argentina.R`
 
-# Manipulación de datos
-library(readxl)        # Importar archivos Excel
-library(dplyr)         # Transformación de datos
-
-# Pruebas estadísticas
-library(lmtest)        # Tests de modelos lineales
-library(nortest)       # Tests de normalidad
-library(fGarch)        # Modelos GARCH
-library(FinTS)         # Análisis financiero
-```
+**También publicado en RPubs:**  
+📊 [Tasa de Interés Efectiva de Argentina](http://rpubs.com/WILLIAM_25/1380989)
 
 ---
 
-## 📥 Fuentes de Datos
+### 4. **Proyectos Publicados en RPubs**
 
-**Inflación mensual:**
-- Fuente: Instituto Nacional de Estadística y Censos (INDEC)
-- Archivo: `data/datos-series-tiempo-argentina.xlsx`
-- Periodo: 1970-2025
+Tengo varios análisis econométricos y estadísticos publicados en RPubs:
 
-**Tasa de interés efectiva:**
-- Fuente: Banco Central de la República Argentina (BCRA)
-- Archivo: `data/tasa-interes-efectiva-argentina.xlsx`
-- Frecuencia: Mensual
-
----
-
-## 🚀 Cómo Reproducir el Análisis
-
-### Requisitos previos:
-```r
-# Instalar paquetes necesarios
-install.packages(c(
-  "forecast", "tseries", "TSA", "ggplot2", 
-  "readxl", "lmtest", "nortest", "fGarch", 
-  "FinTS", "plotly", "dplyr"
-))
-```
-
-### Ejecutar análisis ARIMA:
-```r
-# Abrir RStudio y ejecutar
-setwd("ruta/a/01-series-temporales-argentina")
-
-# Renderizar el R Markdown
-rmarkdown::render("analisis-inflacion-arima-final.Rmd")
-```
-
-### Ejecutar modelos determinísticos:
-```r
-# En R o RStudio
-source("modelo-deterministico-inflacion.R")
-source("modelo-deterministico-tasa-interes.R")
-```
+| Análisis | Descripción | Link |
+|----------|-------------|------|
+| **Tasa de Interés Efectiva Argentina** | Análisis de política monetaria y tasas efectivas | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380989) |
+| **Indicadores Económicos Argentina** | Múltiples análisis de variables macroeconómicas | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380982) |
+| **Análisis Financiero y Económico** | Estudios cuantitativos adicionales | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380940) |
+| **Análisis Complementario** | Otros análisis de interés | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1352257) |
 
 ---
 
-## 📈 Visualizaciones Generadas
+### 5. **Tesis de Grado:  Agendas Concretas de Acción**
 
-### Gráficos principales:
-1. **Serie original con medias móviles** (7 y 30 periodos)
-2. **Descomposición STL** (Tendencia, Estacionalidad, Residuos)
-3. **ACF y PACF** (series original y diferenciada)
-4. **Pronósticos ARIMA** con bandas de confianza
-5. **Residuos estandarizados** con tests diagnósticos
-6. **Comparación de modelos** determinísticos
+**Título:**  
+_"Correlación entre nudos críticos y proyectos en las Agendas Concretas de Acción:  Un análisis cuantitativo de la planificación comunal en Mérida (2019-2025)"_
 
-Todos los gráficos se generan automáticamente y se guardan en `outputs/graficos/`.
+**Descripción:**  
+Análisis econométrico cuantitativo de planificación comunal en Mérida, Venezuela. Se evaluó la correlación entre nudos críticos identificados y proyectos propuestos en las Agendas Concretas de Acción.
 
----
+**Resultados:**
+- Calificación: **19/20**
+- GPA final: **16.31/20** (_Cum Laude_)
+- Código y análisis reproducibles disponibles en GitHub
 
-## 🔍 Interpretación Económica
-
-### Inflación Argentina:
-- **Alta volatilidad** histórica confirmada por el análisis
-- **Tendencia creciente** especialmente en últimas décadas
-- **Estacionalidad presente** pero débil
-- **Outliers** asociados a crisis económicas (2001, 2018, 2020)
-
-### Tasa de Interés:
-- **Política monetaria reactiva** ante inflación
-- **Componente estacional moderado**
-- **Cambios estructurales** evidentes en la serie
+**Repositorio:**  
+🔗 [Monografía - Análisis ACA Mérida](https://github.com/alexwill24/monografia-analisis-aca-merida)
 
 ---
 
-## 📚 Referencias Metodológicas
+## 🛠️ **Tecnologías y Herramientas**
 
-- Box, G. E., Jenkins, G. M., & Reinsel, G. C. (2015). *Time Series Analysis: Forecasting and Control*
-- Hyndman, R. J., & Athanasopoulos, G. (2018). *Forecasting: Principles and Practice*
-- Cleveland, R. B., et al. (1990). "STL: A Seasonal-Trend Decomposition Procedure Based on Loess"
-
----
-
-## 📊 Publicaciones Relacionadas
-
-🔗 **Ver análisis completo en RPubs:**
-- [Series de Tiempo ARIMA](http://rpubs.com/WILLIAM_25/1380982)
-- [Política Monetaria Argentina](http://rpubs.com/WILLIAM_25/1380989)
+| Tecnología | Uso |
+|------------|-----|
+| **R** | Análisis estadístico, visualización, econometría |
+| **Python** | Análisis de datos, machine learning |
+| **Stata** | Regresiones y análisis econométrico |
+| **R Markdown** | Reportes reproducibles |
+| **Typst** | Documentación técnica |
+| **Git/GitHub** | Control de versiones |
 
 ---
 
-## 🤝 Contribuciones
+## 📚 **Habilidades Técnicas Demostradas**
 
-¿Encontraste un bug o tienes sugerencias para mejorar el análisis?
+✅ **Modelado Econométrico:**
+- Modelos lineales (MCO, regresión múltiple)
+- Modelos no lineales (Probit, Logit, Tobit)
+- Series de tiempo (ARIMA, VAR)
+- Datos de panel (efectos fijos y aleatorios)
 
-1. Abre un **Issue** describiendo el problema/sugerencia
-2. Haz un **Fork** del repositorio
-3. Crea una **Pull Request** con tus cambios
+✅ **Análisis de Datos:**
+- Análisis exploratorio (EDA)
+- Visualización de datos
+- Inferencia estadística
+- Pruebas de hipótesis
+
+✅ **Reproducibilidad:**
+- Reportes dinámicos en R Markdown
+- Análisis reproducibles
+- Documentación técnica clara
 
 ---
 
-## 📧 Contacto
+## 📊 **Mi Perfil**
 
-**William Gutierrez**  
-Economista | Analista de Datos  
-📧 gutalex2014@gmail.com  
-🔗 [LinkedIn](https://linkedin.com/in/ecoanalisiswill) | [GitHub](https://github.com/alexwill24)
+**Economista** especializado en análisis de datos e investigación económica cuantitativa. 
+
+- 🎓 Licenciado en Ciencias Económicas (ULA) - _Cum Laude_
+- 📈 Especialista en econometría aplicada y análisis de datos
+- 🔧 Proficiente en R, Python, Stata y herramientas estadísticas
+- 📝 Experiencia en investigación económica y modelaje matemático
+
+**Intereses:**
+- Econometría aplicada
+- Ciencia de datos
+- Análisis de políticas públicas
+- Evaluación de proyectos
+- Modelaje estadístico
 
 ---
 
-<div align="center">
+## 📞 **Contacto**
 
-**← [Volver al repositorio principal](../README.md)**
+- 📧 Email: [gutalex2014@gmail.com](mailto:gutalex2014@gmail.com)
+- 🔗 GitHub: [@alexwill24](https://github.com/alexwill24)
+- 💼 LinkedIn: [ecoanalisiswill](https://linkedin.com/in/ecoanalisiswill)
+- 🌐 Portafolio: [gutalex2014.wixsite.com/portafolio-william-g](https://gutalex2014.wixsite.com/portafolio-william-g)
 
-</div>
+---
+
+## 📝 **Licencia**
+
+Estos trabajos son de carácter académico.  Se distribuyen bajo licencia [MIT](LICENSE) con fines educativos. 
+
+---
+
+**Última actualización:** Diciembre 2025  
+**Versión:** 1.0
