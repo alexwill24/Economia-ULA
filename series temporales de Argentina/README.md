@@ -15,24 +15,7 @@ Análisis econométrico exhaustivo de indicadores económicos argentinos utiliza
 | `modelo-deterministico-inflacion.R` | Modelos determinísticos (dicotómico/trigonométrico) | R Script |
 | `modelo-deterministico-tasa-interes.R` | Análisis de tasa de interés efectiva | R Script |
 | `significancia-individual.R` | Pruebas de significancia de parámetros | R Script |
-
-### Estructura de Carpetas
-
-```
-01-series-temporales-argentina/
-├── README.md (este archivo)
-├── analisis-inflacion-arima-final.Rmd
-├── analisis-inflacion-arima.Rmd
-├── modelo-deterministico-inflacion.R
-├── modelo-deterministico-tasa-interes.R
-├── significancia-individual.R
-├── data/
-│   ├── datos-series-tiempo-argentina.xlsx
-│   └── tasa-interes-efectiva-argentina.xlsx
-└── outputs/
-    ├── graficos/
-    └── resultados/
-```
+| `analisis-de-serie-de-tiempo-estocastica-de-argentina` | Documento escrito con todo el trabajo | PDF |
 
 ---
 
