@@ -1,0 +1,551 @@
+---
+title: Modelo Probit y Logit sobre solicitudes de préstamo hipotecario en Estados
+  Unidos del dataset de Wooldridge
+author: "William A. Gutierrez V."
+date: "2025-06-01"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document: default
+---
+
+Para realizar este modelo de Wooldridge, haremos uso de la base de datos `Loanapp` del paquete `wooldridge`. La base de datos loanapp proviene del paquete wooldridge en R, este contiene información de solicitudes de préstamo hipotecario en Estados Unidos y algunas características del solicitante y del préstamo. A grandes rasgos:
+
+Número de observaciones: 1989 (o muy cercano, dado que hay algunas filas con NAs en ciertas variables).
+
+Estps datos demuestran las solicitudes de préstamo hipotecario (por ejemplo, derivadas de los datos HMDA de los años 2006–2007; Wooldridge lo usa como ejemplo de discriminación en otorgamiento de préstamos), el objetivo es estimar un modelo Probit de aprobación de préstamos (approve) en función de la variable white (raza del solicitante), luego agregar varias covariables financieras y demográficas, comparar con Logit y calcular el efecto discriminatorio medio.
+
+Las Variables del modelo son las siguientes, 1989 observaciones y 59 variables:
+
+**Variable dependiente**
+
+-   approve (binaria): 1 si el préstamo fue aprobado, 0 si fue rechazado.
+
+**Variables independientes (covariables)**
+
+-   white (0/1): indicador de que el solicitante es blanco (1 = sí, 0 = no).
+
+-   hrat (contínua): housing‐ratio, es decir, proporción del ingreso mensual destinado a gastos de hipoteca.
+
+-   obrat (contínua): other‐debt ratio, proporción del ingreso que se destina a otras deudas.
+
+-   loanprc (contínua): loan‐to‐price ratio, monto del préstamo dividido por el valor de la propiedad.
+
+-   unem (contínua): tasa de desempleo en la zona del solicitante (en porcentaje).
+
+-   male (0/1): indicador de género (1 = hombre, 0 = mujer).
+
+-   married (0/1): indicador de estado civil (1 = casado/a, 0 = no).
+
+-   dep (entero): número de dependientes a cargo del solicitante.
+
+-   sch (entero): años de escolaridad del solicitante.
+
+-   cosign (0/1): indicador de si se requiere un co‐firmante (1 = sí, 0 = no).
+
+-   chist (0/1): historial de crédito (1 = historial aceptable, 0 = no).
+
+-   pubrec (0/1): registro público adverso (1 = existe, 0 = no).
+
+-   mortlat1 (0/1): atrasos en pagos hipotecarios en el último año (1 = sí, 0 = no).
+
+-   mortlat2 (0/1): atrasos en pagos hipotecarios en los últimos 2 años (1 = sí, 0 = no).
+
+-   vr (contínua): value‐ratio o fracción del valor de la propiedad que el solicitante paga como entrada.
+
+**Obtenemos la siguiente ecuación de regresión a estimar:**
+
+$$
+Pr(approve_i^* \;= 1∣X 
+i   \;\;=\;Φ\;(\;\beta_{0}
+    \;+\; \beta_{1}\,\text{white}_i
+    \;+\; \beta_{2}\,\text{hrat}_i
+    \;+\; \beta_{3}\,\text{obrat}_i
+    \;+\; \beta_{4}\,\text{loanprc}_i
+    \;+\; \beta_{5}\,\text{unem}_i
+    \;+\; \beta_{6}\,\text{male}_i
+    \;+\; \beta_{7}\,\text{married}_i
+    \;+\; \beta_{8}\,\text{dep}_i
+    \;+\; \beta_{9}\,\text{sch}_i
+    \;+\; \beta_{10}\,\text{cosign}_i
+    \;+\; \beta_{11}\,\text{chist}_i
+    \;+\; \beta_{12}\,\text{pubrec}_i
+    \;+\; \beta_{13}\,\text{mortlat1}_i
+    \;+\; \beta_{14}\,\text{mortlat2}_i
+    \;+\; \beta_{15}\,\text{vr}_i
+    \;+\; u_i)
+$$ 
+
+
+Cargamos las siguientes librerias para proceder con el calculo del modelo en R Studio:
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(wooldridge)
+library(dplyr)
+library(knitr)
+library(ggplot2)
+library(scales)
+library(cluster)     
+library(factoextra) 
+library(car)
+library(carData)
+library(margins)
+library(prediction)
+library(tidyr)
+library(GGally)
+library(stringr)
+library(AER)
+library(aod)
+library(texreg)
+library(pROC)            
+library(caret)          
+library(ResourceSelection) 
+library(tinytex)
+library(labeling)
+data("loanapp", package = "wooldridge")
+str(loanapp)
+attach(loanapp)
+```
+
+
+Estimamos un modelo probit de approve sobre white. Encuentre la probabilidad de que se apruebe un préstamo tanto para blancos como para no blancos. ¿Cómo se compara esto con las estimaciones de probabilidad lineal?
+
+```{r, probit_model}
+# Estimar el modelo Probit
+
+model_probit <- glm(approve ~ white, data = loanapp, family = binomial(link = "probit"))
+summary(model_probit)
+
+```
+
+## Calculamos las probabilidades para blancos y no blancos
+
+```{r calcular_probabilidades}
+# Extraer coeficientes
+b0 <- coef(model_probit)[1]  # Intercepto
+b1 <- coef(model_probit)[2]  # Coef. de white
+
+# Función de distribución normal estándar (CDF)
+pnorm_white1 <- pnorm(b0 + b1)  # Para blancos (white = 1)
+pnorm_white0 <- pnorm(b0)       # Para no blancos (white = 0)
+
+# Mostrar resultados
+pnorm_white0
+pnorm_white1
+
+```
+
+## Comparamos con un modelo de probabilidad lineal
+
+Usamos un modelo LPM
+
+```{r, modelo LPM}
+# Estimar modelo LPM (MCO)
+model_lpm <- lm(approve ~ white, data = loanapp)
+summary(model_lpm)
+
+# Probabilidades estimadas en LPM
+lpm_white0 <- coef(model_lpm)[1]
+lpm_white1 <- coef(model_lpm)[1] + coef(model_lpm)[2]
+
+lpm_white0  # No blancos
+lpm_white1  # Blancos
+```
+
+## Interpretación de resultados
+
+```{r, interpretacion y diferencias de las probabilidades}
+
+# Diferencia estimada en las probabilidades
+diff_probit <- pnorm_white1 - pnorm_white0
+diff_lpm <- lpm_white1 - lpm_white0
+
+# Mostrar comparaciones
+cat("Probit - Probabilidad aprobación (no blancos):", round(pnorm_white0, 3), "\n")
+cat("Probit - Probabilidad aprobación (blancos):", round(pnorm_white1, 3), "\n")
+cat("Probit - Diferencia:", round(diff_probit, 3), "\n\n")
+
+cat("LPM - Probabilidad aprobación (no blancos):", round(lpm_white0, 3), "\n")
+cat("LPM - Probabilidad aprobación (blancos):", round(lpm_white1, 3), "\n")
+cat("LPM - Diferencia:", round(diff_lpm, 3), "\n")
+
+# Crear dataframe resumen
+prob_table <- data.frame(
+  Modelo = c("Probit", "Probit", "LPM", "LPM"),
+  Grupo = c("No blancos", "Blancos", "No blancos", "Blancos"),
+  Probabilidad = c(pnorm_white0, pnorm_white1, lpm_white0, lpm_white1)
+)
+
+# Mostrar tabla
+knitr::kable(prob_table, digits = 5, caption = "Probabilidades estimadas de aprobación por modelo y grupo racial")
+
+# Graficar las probabilidades
+ggplot(prob_table, aes(x = Grupo, y = Probabilidad, fill = Modelo)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Comparación de probabilidades estimadas",
+       y = "Probabilidad estimada",
+       x = "Grupo") +
+  scale_fill_manual(values = c("steelblue", "darkorange")) +
+  theme_minimal()
+```
+
+Se estimó un modelo Probit con el objetivo de evaluar la probabilidad de aprobación de un préstamo (approve) en función de la variable binaria white, que indica si el solicitante es blanco o no (binario). Los resultados muestran que la probabilidad estimada de aprobación para los solicitantes no blancos es de aproximadamente 70,8%, mientras que para los solicitantes blancos es de 90,8%.
+
+Esta diferencia de 20 puntos porcentuales sugiere que, en promedio, los solicitantes blancos enfrentan una mayor probabilidad de aprobación en comparación con los no blancos. Cabe resaltar que estas estimaciones representan probabilidades condicionales derivadas del modelo, es decir, son promedios para cada grupo en la muestra y no deben interpretarse como predicciones exactas para individuos particulares, además que se hizo uso de una sola variable explicativa binaria (white), el modelo necesita mayor introducción de variables para ser más robusto y confiable.
+
+También hay que señalar lo siguiente con respecto a este modelo, el modelo de probabilidad lineal (LPM) arrojó exactamente las mismas probabilidades para ambos grupos. Esto se explica por el hecho de que, en presencia de una única variable explicativa binaria (white), tanto el modelo Probit como el LPM ajustan las medias observadas de la variable dependiente en cada grupo. Sin embargo, en aplicaciones más complejas que incorporen múltiples regresores, se espera que las estimaciones de ambos modelos diverjan, siendo el modelo Probit más adecuado para garantizar que las probabilidades estimadas se mantengan dentro del intervalo [0,1]
+
+| Aspecto | Modelo LPM | Modelo Probit |
+|----|----|----|
+| Tipo de modelo | Lineal | No lineal (función normal acumulada) |
+| Predicciones fuera de [0,1] | Posibles | Nunca |
+| Interpretación de coeficientes | Cambio marginal directo (en %) | Cambio marginal *condicional,* necesita calcular derivadas |
+| Facilidad de estimación | Muy simple (Regresión MCO) | Más complejo (Máximo de verosimilitud) |
+| Bondad de ajustes en extremos | Malas si hay valores cercanos a cero | Mejor ajuste en extremos |
+| En este ejercicio item 1 | Estimación identicas | Estimación identicas |
+|  |  |  |
+
+
+
+Ahora, agregamos las variables hrat, obrat, loanprc, unem, male, married, dep, sch,cosign, chist, pubrec, mortlat1, mortlat2 y vr al modelo probit. ¿Hay alguna evidencia estadísticamente significativa de discriminación contra los no blancos?
+
+```{r, modelo probit ampliado}
+# Estimación del modelo Probit ampliado con más variables junto con el modelo de probabilidad lineal (LPM)
+
+model_probit_ext <- glm(approve ~ white + hrat + obrat + loanprc + unem + male + married + dep + sch + cosign + chist + pubrec + mortlat1 + mortlat2 + vr , data = loanapp, family = binomial(link = "probit"))
+
+summary(model_probit_ext)
+
+model_lpm_ext <- lm(approve ~ white + hrat + obrat + loanprc + unem + male + married + dep + sch + cosign + chist + pubrec + mortlat1 + mortlat2 + vr, data = loanapp)
+
+summary(model_lpm_ext)
+```
+Para evaluar la probabilidad de aprobación de un préstamo en función de características socioeconómicas y demográficas del solicitante, se estimaron dos modelos: un modelo lineal de probabilidad (LPM) mediante regresión por mínimos cuadrados ordinarios (MCO) y un modelo Probit, que pertenece a la clase de modelos no lineales para variables dependientes binarias.
+
+Ambos modelos incluyen como variable explicativa principal la dummy white, así como un conjunto de covariables que capturan aspectos relevantes del perfil del solicitante: ratios financieros (hrat, obrat, loanprc, unem), características individuales (male, married, dep, sch), condiciones crediticias (cosign, chist, pubrec, mortlat1, mortlat2) y del entorno (vr).
+
+A primera vista, los coeficientes estimados en ambos modelos permiten observar direcciones consistentes de los efectos esperados: por ejemplo, el coeficiente de white es positivo y altamente significativo tanto en el modelo Probit (0.520, p < 0.001) como en el LPM (0.129, p < 0.001), lo cual indica que ser blanco se asocia con una mayor probabilidad de aprobación del crédito. Sin embargo, es importante resaltar que, a diferencia del LPM, los coeficientes del modelo Probit no se interpretan como cambios marginales en la probabilidad.
+
+Esto se debe a que el modelo Probit introduce una relación no lineal entre las covariables y la probabilidad del evento de interés, mediante la función de distribución normal acumulada. Por tanto, el parámetro estimado para cada variable representa su efecto sobre una variable latente no observada, y no directamente sobre la probabilidad. En consecuencia, interpretar el coeficiente como si fuese un cambio porcentual en la probabilidad —como es posible en el LPM— sería incorrecto y potencialmente engañoso.
+
+Por esta razón, se recurre al cálculo de los **efectos marginales**, los cuales representan el cambio estimado en la probabilidad de aprobación ante una variación marginal (en el caso de variables continuas) o discreta (en el caso de variables binarias) de cada covariable, manteniendo constante el resto del modelo. Estos efectos marginales permiten establecer comparaciones más precisas entre los determinantes de la probabilidad de aprobación y constituyen la herramienta adecuada para el análisis económico en este tipo de modelos.
+
+Por lo tanto haremos el calculo de los efectos marginales del modelo Probit:
+
+```{r, efectos marginales probit}
+
+efectosprobit <- margins(model_probit_ext)
+summary(efectosprobit)
+
+# DataFrame con AME, límites inferior y superior
+df_mfx <- data.frame(
+  factor = c(
+    "chist", "cosign", "dep", "hrat", "loanprc", "male", "married",
+    "mortlat1", "mortlat2", "obrat", "pubrec", "sch", "unem", "vr", "white"
+  ),
+  AME = c(
+    0.0972, 0.0143, -0.0082, 0.0013, -0.1680, -0.0061, 0.0441,
+    -0.0312, -0.0821, -0.0046, -0.1293, 0.0024, -0.0061, -0.0334, 0.0864
+  ),
+  lower = c(
+    0.0664, -0.0641, -0.0209, -0.0010, -0.2461, -0.0419, 0.0133,
+    -0.1148, -0.1881, -0.0066, -0.1698, -0.0286, -0.0118, -0.0599, 0.0552
+  ),
+  upper = c(
+    0.1280, 0.0927, 0.0045, 0.0036, -0.0900, 0.0296, 0.0749,
+    0.0525, 0.0239, -0.0026, -0.0888, 0.0335, -0.0003, -0.0069, 0.1176
+  )
+)
+
+# Calcular distancias para las barras de error
+df_mfx$error_lower <- df_mfx$AME - df_mfx$lower
+df_mfx$error_upper <- df_mfx$upper - df_mfx$AME
+
+# Gráfico de barras con barras de error
+ggplot(df_mfx, aes(x = factor, y = AME)) +
+  geom_bar(stat = "identity", fill = "skyblue", width = 0.7) +
+  geom_errorbar(aes(ymin = AME - error_lower, ymax = AME + error_upper),
+                width = 0.2, color = "black") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  coord_cartesian(ylim = c(-0.25, 0.15)) +
+  labs(
+    x = "Variable",
+    y = "Efecto marginal promedio (AME)",
+    title = "Efectos marginales promedio y barras de confianza (95 %)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+Luego de estimar el modelo Probit con todas las variables relevantes, se procedió al cálculo de los efectos marginales promedio (Average Marginal Effects, AME) mediante el paquete margins de R, con el fin de interpretar correctamente el impacto de cada variable sobre la probabilidad de aprobación del préstamo (approve).
+
+Entre los resultados más destacados, se observa que la variable white presenta un efecto marginal positivo y estadísticamente significativo. Específicamente, ser blanco incrementa en promedio la probabilidad de aprobación del préstamo en 8.64% puntos porcentuales (AME = 0.0864, p < 0.001), manteniendo constantes las demás variables del modelo. Este resultado sugiere la existencia de discriminación racial estadísticamente significativa en el proceso de aprobación, aun después de controlar por factores socioeconómicos, financieros y crediticios del solicitante.
+
+Además, varias otras variables mostraron efectos significativos y consistentes con la **teoría económica del crédito**:
+
+chist (historial de crédito positivo) incrementa la probabilidad de aprobación en 9.72% puntos porcentuales (AME = 0.0972, p < 0.001), lo que confirma la importancia de tener un historial limpio para acceder al financiamiento.
+
+pubrec (registro público de bancarrota) reduce en promedio la probabilidad de aprobación en 13 (-12.93%) puntos porcentuales (AME = -0.1293, p < 0.001), indicando un efecto penalizador sobre la confianza del otorgante de crédito.
+
+loanprc (razón entre monto del préstamo y precio de la propiedad) tiene un efecto negativo considerable en un -16.8% (AME = -0.168, p < 0.001), reflejando que una mayor proporción de financiamiento solicitado se asocia con mayor riesgo percibido por el prestamista.
+
+obrat (otras obligaciones como % del ingreso) también disminuye significativamente en un -0.46% la probabilidad de aprobación (AME = -0.0046, p < 0.001), lo cual es coherente con un mayor nivel de endeudamiento previo.
+
+married (estado civil casado) incrementa la probabilidad de aprobación en 4.41% puntos porcentuales (p = 0.005), lo que puede interpretarse como una señal de estabilidad económica o compartición de cargas financieras.
+
+vr (tasa de vacancia residencial del área) tiene un efecto negativo significativo de -3,34% (AME = -0.0334, p = 0.0135), sugiriendo que vivir en una zona con alto nivel de viviendas vacías reduce la probabilidad de recibir financiamiento, posiblemente por ser considerada de menor valorización o mayor riesgo de impago hipotecario dependiendo del analisis que se haga.
+
+unem (tasa de desempleo) también reduce la probabilidad de aprobación -0.61% (AME = -0.0061, p = 0.0378), lo cual es coherente con mayores riesgos asociados al entorno laboral.
+
+En contraste, variables como male, sch, cosign, mortlat1, mortlat2 y dep no resultaron estadísticamente significativas en este modelo, lo que sugiere que su influencia sobre la aprobación no puede ser confirmada con los datos disponibles. En conjunto, estos resultados refuerzan la importancia de utilizar modelos no lineales como el Probit en contextos de respuesta binaria, ya que permiten estimar con mayor realismo la probabilidad de ocurrencia de un evento. El uso de los efectos marginales resulta indispensable para traducir los coeficientes estimados en términos directamente interpretables en análisis económicos y de políticas públicas.
+
+Por lo tanto, sí el efecto marginal promedio (AME) de la variable white resulta ser 0.0864 (8.64%) con un valor p < 0.001. Esto significa que, manteniendo fijas todas las demás covariables, ser blanco aumenta en promedio la probabilidad de aprobación del préstamo en 8.64 puntos porcentuales. Dado que este coeficiente es positivo y altamente significativo, podemos concluir que, a igualdad de características observables, los solicitantes no blancos tienen una probabilidad significativamente más baja de obtener la aprobación que los blancos. En otras palabras, existe evidencia estadísticamente significativa de discriminación contra los no blancos en el proceso de aprobación crediticia (pues el hecho de ser blanco confiere una ventaja de 8.64 pp en la probabilidad de aprobación, con p < 0.001).
+
+Estimamos un tercer modelo extendido, el cual es un modelo Logit con las mismas variables que el Probit ampliado. Compare los coeficientes de white en ambos modelos e interprete los resultados en términos de efectos marginales promedio (AME) y probabilidades predichas:
+
+```{r, modelo_logit}
+# Estimar el modelo Logit extendido
+model_logit_ext <- glm(
+  approve ~ white + hrat + obrat + loanprc + unem + male + married +
+    dep + sch + cosign + chist + pubrec + mortlat1 + mortlat2 + vr,
+  data = loanapp,
+  family = binomial(link = "logit")
+)
+
+summary(model_logit_ext)
+```
+
+En el Probit, β_white = 0.5203 indica el cambio en la “propensión latente” (en unidades de desviación estándar de la normal) que conlleva pasar de white = 0 → 1.
+
+En el Logit, β_white = 0.9378 mide el cambio en el log‐odds (logaritmo del Odds Ratio) que acompañaría a ese mismo salto de white = 0 → 1.
+
+Ambos coeficientes son positivos y altamente significativos, lo que en ambos modelos apunta a que “ser blanco” aumenta la propensión a la aprobación del préstamo. Para cuantificar en puntos porcentuales de probabilidad, hay que calcular los efectos marginales promedio (AME) en cada modelo, que es lo que corresponde en un contexto de modelos no lineales.
+
+```{r, AME logit y probit}
+# Efectos marginales promedio del modelo Probit extendido
+
+smry_probit_mfx <- summary(efectosprobit)
+
+# Efectos marginales promedio del modelo Logit extendido
+mfx_logit_ext  <- margins(model_logit_ext)
+summary(mfx_logit_ext)
+smry_logit_mfx <- summary(mfx_logit_ext)
+
+# (3) Extraer sólo la fila correspondiente a "white" en cada resumen
+ame_probit_white <- subset(smry_probit_mfx, factor == "white", select = c(AME, SE, lower, upper))
+ame_logit_white  <- subset(smry_logit_mfx,  factor == "white", select = c(AME, SE, lower, upper))
+
+# (4) Crear un data.frame que combine ambos resultados
+df_white_compare <- data.frame(
+  Modelo = c("Probit", "Logit"),
+  AME    = c(ame_probit_white$AME,  ame_logit_white$AME),
+  lower  = c(ame_probit_white$lower, ame_logit_white$lower),
+  upper  = c(ame_probit_white$upper, ame_logit_white$upper)
+)
+
+df_white_compare$error_lower <- df_white_compare$AME - df_white_compare$lower
+df_white_compare$error_upper <- df_white_compare$upper - df_white_compare$AME
+
+# Gráfico de comparación de AME para "white" entre Probit y Logit
+ggplot(df_white_compare, aes(x = Modelo, y = AME, fill = Modelo)) +
+  geom_bar(stat = "identity", width = 0.5) +
+  geom_errorbar(aes(ymin = AME - error_lower, ymax = AME + error_upper),
+                width = 0.2, color = "black") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  labs(
+    title = "Comparación del efecto marginal promedio de 'white'\n(Probit vs. Logit)",
+    x = "",
+    y = "Cambio en probabilidad (AME)"
+  ) +
+  scale_fill_manual(values = c("steelblue", "darkorange")) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(size = 11),
+    plot.title = element_text(size = 14, hjust = 0.5)
+  )
+
+# Calcular medias para variables continuas
+mean_hrat    <- mean(loanapp$hrat, na.rm = TRUE)
+mean_obrat   <- mean(loanapp$obrat, na.rm = TRUE)
+mean_loanprc <- mean(loanapp$loanprc, na.rm = TRUE)
+mean_unem    <- mean(loanapp$unem, na.rm = TRUE)
+
+# Moda (más frecuente) para variables binarias
+det_moda <- function(x) as.numeric(names(sort(table(x), decreasing = TRUE)[1]))
+
+mode_male      <- det_moda(loanapp$male)
+mode_married   <- det_moda(loanapp$married)
+mode_dep       <- round(mean(loanapp$dep, na.rm = TRUE))
+mode_sch       <- det_moda(loanapp$sch)
+mode_cosign    <- det_moda(loanapp$cosign)
+mode_chist     <- det_moda(loanapp$chist)
+mode_pubrec    <- det_moda(loanapp$pubrec)
+mode_mortlat1  <- det_moda(loanapp$mortlat1)
+mode_mortlat2  <- det_moda(loanapp$mortlat2)
+mode_vr        <- det_moda(loanapp$vr)
+
+# Crear datos nuevos para white = 0 y 1
+newdata <- data.frame(
+  white     = c(0, 1),
+  hrat      = mean_hrat,
+  obrat     = mean_obrat,
+  loanprc   = mean_loanprc,
+  unem      = mean_unem,
+  male      = mode_male,
+  married   = mode_married,
+  dep       = mode_dep,
+  sch       = mode_sch,
+  cosign    = mode_cosign,
+  chist     = mode_chist,
+  pubrec    = mode_pubrec,
+  mortlat1  = mode_mortlat1,
+  mortlat2  = mode_mortlat2,
+  vr        = mode_vr
+)
+
+# Predecir probabilidades con ambos modelos
+newdata$Probit <- predict(model_probit_ext, newdata = newdata, type = "response")
+newdata$Logit  <- predict(model_logit_ext,  newdata = newdata, type = "response")
+
+# Reorganizar para graficar
+library(tidyr)
+df_preds <- newdata %>%
+  select(white, Probit, Logit) %>%
+  pivot_longer(cols = c("Probit", "Logit"), names_to = "Modelo", values_to = "Probabilidad") %>%
+  mutate(white = factor(white, levels = c(0, 1), labels = c("No blanco", "Blanco")))
+
+# Gráfico de probabilidades predichas
+ggplot(df_preds, aes(x = white, y = Probabilidad, fill = Modelo)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.7), width = 0.6) +
+  labs(
+    title = "Probabilidad predicha de aprobación\nsegún 'white' (Probit vs. Logit)",
+    x = "Grupo racial",
+    y = "Probabilidad estimada"
+  ) +
+  scale_fill_manual(values = c("steelblue", "darkorange")) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank(),
+    axis.text = element_text(size = 11)
+  )
+
+# (Opcional) Tabla resumen de probabilidades predichas
+print(newdata[, c("white", "Probit", "Logit")])
+
+```
+
+En términos comparativos, los AME de white en Probit (8.64 pp) y Logit (8.28 pp) resultan prácticamente equivalentes y ambos son estadísticamente significativos (p < 0.001). Esto confirma que el efecto hacia arriba en la probabilidad de aprobación para solicitantes blancos es robusto a la elección del enlace (función de distribución normal vs. logística).
+
+En el modelo Probit, la probabilidad de aprobación para un solicitante “típico” no blanco es 88.83 %, mientras que para un solicitante blanco es 95.89 %, lo que refleja un incremento de 7.06 puntos porcentuales (95.89 % – 88.83 %).
+
+En el modelo Logit, dichos valores son 89.48 % (no blanco) y 95.59 % (blanco), equivalentes a un aumento de 6.11 puntos porcentuales (95.59 % – 89.48 %).
+
+En ambos casos, la diferencia absoluta en probabilidades predichas (7.06 pp vs. 6.11 pp) es muy similar, y ambas diferencias son consistentes con los AME obtenidos (8.64 pp y 8.28 pp), pues los AME corresponden al promedio marginal sobre toda la muestra y las probabilidades predichas se refieren a una observación “típica”.
+
+
+Tanto los coeficientes “crudos” (Probit: 0.5203; Logit: 0.9378) como los efectos marginales en probabilidad confirman que ser blanco está asociado a una mayor probabilidad de aprobación de préstamos.
+
+Al comparar los AME, encontramos 8.64 pp (Probit) vs. 8.28 pp (Logit), ambos estadísticamente distintos de cero (p < 0.001). Las probabilidades predichas para un individuo promedio muestran incrementos de 7.06 pp en Probit y 6.11 pp en Logit al pasar de white = 0 a white = 1.
+
+En síntesis, independientemente del enlace utilizado, existe evidencia estadística robusta de que “ser blanco” confiere aproximadamente un 8–9 % adicional de probabilidad de aprobación de préstamo, lo cual respalda la existencia de discriminación racial en el proceso crediticio, tras controlar por características económicas, demográficas y de historial de crédito.
+
+Luego, estimamos un **efecto discriminativo** puede estimarse como el promedio de las diferencias en probabilidades predichas entre dos valores de una variable binaria manteniendo el resto constante.
+
+```{r, discriminatorio logit y probit}
+# 4) Efectos discriminativos usando la ecuación (17.17)
+# Para evitar NA, filtrar sólo observaciones completas en todas las variables implicadas
+vars <- c("approve", "white", "hrat", "obrat", "loanprc", "unem", "male", "married", "dep", "sch", "cosign", "chist", "pubrec", "mortlat1", "mortlat2", "vr")
+idx <- complete.cases(loanapp[, vars])
+loanapp_cc <- loanapp[idx, ]  # datos completos
+
+# Crear dos copias del dataset completo: white = 0 y white = 1
+df0 <- loanapp_cc
+df0$white <- 0
+df1 <- loanapp_cc
+df1$white <- 1
+
+# Predecir probabilidades Probit solo con observaciones completas
+pi0_probit <- predict(model_probit_ext, newdata = df0, type = "response")
+pi1_probit <- predict(model_probit_ext, newdata = df1, type = "response")
+
+# Calcular el efecto discriminativo promedio en Probit, omitiendo NA si existieran
+disc_probit <- mean(pi1_probit - pi0_probit, na.rm = TRUE)
+
+# Predecir probabilidades Logit
+pi0_logit <- predict(model_logit_ext, newdata = df0, type = "response")
+pi1_logit <- predict(model_logit_ext, newdata = df1, type = "response")
+
+# Calcular el efecto discriminativo promedio en Logit
+disc_logit <- mean(pi1_logit - pi0_logit, na.rm = TRUE)
+
+# Mostrar resultados en un data.frame
+df_disc <- data.frame(
+  Modelo         = c("Probit", "Logit"),
+  Discriminacion = c(round(disc_probit, 4), round(disc_logit, 4))
+)
+print(df_disc)
+
+# Grafca
+df_disc <- data.frame(
+  Modelo         = c("Probit", "Logit"),
+  Discriminacion = c(0.1042, 0.1009)
+)
+
+ggplot(df_disc, aes(x = Modelo, y = Discriminacion, fill = Modelo)) +
+  geom_bar(stat = "identity", width = 0.5) +
+  geom_text(aes(label = scales::percent(Discriminacion, accuracy = 0.1)),
+            vjust = -0.5, size = 4) +
+  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0, 0.1))) +
+  scale_fill_manual(values = c("steelblue", "darkorange")) +
+  labs(
+    title = "Efectos discriminativos promedio (Ecuación 17.17)",
+    subtitle = "Comparación entre Probit y Logit",
+    x = "",
+    y = "Incremento en probabilidad (%)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    axis.text.x = element_text(size = 11)
+  )
+
+```
+Se calculó el efecto discriminativo promedio de la variable binaria white en los modelos Probit y Logit, utilizando la ecuación (17.17) del texto. Para ello, se crearon dos conjuntos de datos: uno con white = 0 (no blanco) y otro con white = 1 (blanco), manteniendo constantes las demás variables, Al emplear la fórmula propuesta en Wooldridge (2009, eq. 17.17), se calculó para cada familia la diferencia en la probabilidad de aprobación de su hipoteca entre los dos escenarios contrafactuales:
+
+Asignar white = 0 (no blanco) y mantener el resto de variables en sus valores reales,
+
+Asignar white = 1 (blanco) y mantener las demás variables en los mismos valores.
+
+Luego se promediaron esas diferencias a lo largo de todas las observaciones con datos completos.
+
+En el modelo Probit, la media de esas diferencias contrafactuales fue de 0.1042, lo que indica que, ceteris paribus, ser blanco incrementa en 10.42 puntos porcentuales (pp) la probabilidad de que se apruebe el préstamo.
+
+En el modelo Logit, se obtuvo un valor muy similar: 0.1009, de modo que ser blanco aporta en promedio 10.09 pp adicionales de probabilidad de aprobación, controlando por ingreso, obligaciones, estado civil, historial crediticio, etc.
+
+La estrecha concordancia entre 0.1042 y 0.1009 refuerza la robustez del hallazgo de discriminación. En ambos enlaces (Probit y Logit), el efecto medio contrafactual de la variable white equivale a aproximadamente un décimo de punto porcentual en la probabilidad de aprobación, sugiriendo que, incluso después de controlar por las características socioeconómicas y crediticias, la raza sigue siendo una variable determinante con un impacto cuantificable de alrededor del 10 %.
+
+Varias razones pueden explicar por qué, incluso controlando todas las características socioeconómicas y crediticias observables, los solicitantes blancos gozan de una probabilidad de aprobación de préstamo entre 10 y 11 puntos porcentuales mayor que los no blancos.
+
+1. Rol de las guías crediticias y criterios internos de las instituciones
+Muchos prestamistas aplican “guías” o políticas internas que asignan puntajes crediticios y tasas de interés basándose en una combinación de factores demográficos y financieros, pero en la práctica pueden incluir ponderaciones subjetivas. Si dichas guías incorporan variables correlacionadas con la raza (por ejemplo, zonas geográficas históricamente segregadas o colonias con menor acceso a servicios financieros), el resultado puede ser un sesgo estructural que favorezca población blanca.
+
+2. Sesgo institucional y discrimen inconsciente
+Aunque los funcionarios de un banco o entidad de crédito no tengan la intención explícita de discriminar, existen múltiples estudios sobre “discriminación implícita” en procesos de otorgamiento de crédito. Los algoritmos de scoring —y en algunos casos, los oficiales de crédito— pueden perpetuar estereotipos o sesgos históricos: por ejemplo, asumir mayor riesgo en solicitantes de ciertas minorías, basándose en experiencias pasadas. Este sesgo “inconsciente” se traduce en una diferencia persistente de aprobación, aun cuando los solicitantes presenten perfiles económicos comparables.
+
+3. Disparidad en el acceso a información pre-aprobatoria
+La disponibilidad de asesoría financiera y el acceso a “pre-aprobaciones” de hipoteca no está distribuido homogéneamente. Las familias blancas, en promedio, tienen redes de contacto y canales de información (asesores, brokers o bonificaciones de ciertos programas de ayuda) que les permiten conocer ofertas de crédito con antelación y optimizar su solicitud (ajustar deuda, mejorar calificaciones, reunir garantías adicionales). En contraste, los solicitantes no blancos suelen enfrentar barreras de información que limitan su capacidad para presentar una solicitud “óptima” al prestamista.
+
+4. Impacto de la historia de redlining y desigualdades previas
+La práctica histórica de redlining (rehusar o imponer condiciones estrictas en préstamos a quienes vivían en barrios minoritarios) ha dejado efectos duraderos en las comunidades afectadas: menor acumulación de patrimonio, menor densidad de sucursales bancarias y menor experiencia en trámites crediticios formales. Estas desigualdades previas generan diferencias en variables subyacentes (como “propiedad de vivienda” o “valor del aval”), que no siempre quedan completamente capturadas por las covariables habituales. Así, el modelo puede subestimar el riesgo crediticio de solicitantes blancos al compararlos con no blancos, perpetuando brechas intergeneracionales de acceso a la vivienda.
+
+5. Implicaciones sociales y de política pública
+Desde la perspectiva de políticas públicas, un hallazgo de discriminación de alrededor de un 10 % en la probabilidad de aprobación es relevante para diseñar intervenciones. Por ejemplo, se podrían exigir auditorías rutinarias a instituciones financieras para evaluar su cumplimiento con normas de igualdad de trato; implementar programas de educación financiera dirigidos a comunidades vulnerables; o reforzar supervisión regulatoria sobre algoritmos de scoring crediticio. Sin intervenciones adecuadas, la brecha observada tiende a replicarse en generaciones futuras, exacerbando la desigualdad de riqueza y acceso a vivienda —dos determinantes clave de la movilidad social.
