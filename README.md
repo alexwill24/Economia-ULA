@@ -161,6 +161,7 @@ Análisis econométrico cuantitativo de planificación comunal en Mérida, Venez
 - 🔗 GitHub: [@alexwill24](https://github.com/alexwill24)
 - 💼 LinkedIn: [ecoanalisiswill](https://linkedin.com/in/ecoanalisiswill)
 - 🌐 Portafolio: [gutalex2014.wixsite.com/portafolio-william-g](https://gutalex2014.wixsite.com/portafolio-william-g)
+- 💼 Curriculum: [Typst.app](https://typst.app/project/r20PNI1n2w0sPeNdjvHeEW)
 
 ---
 
