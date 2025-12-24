@@ -9,7 +9,7 @@ Aquí encontrarás proyectos de econometría, análisis de series temporales, an
 ## 📁 Estructura del Repositorio
 
 ```
-Econom-a-ULA/
+Economia-ULA/
 ├── 01-series-temporales-argentina/    # Análisis ARIMA e inflación
 ├── 02-modelos-binarios/               # Modelos Probit y Logit
 ├── 03-analisis-rpubs/                 # Proyectos publicados en RPubs
