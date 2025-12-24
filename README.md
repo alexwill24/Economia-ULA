@@ -42,7 +42,7 @@ Análisis econométrico sobre aprobación de préstamos hipotecarios utilizando 
 - `analisis_probit_logit.html` - Reporte compilado interactivo
 
 **Leer:**  
-📄 [Ver análisis completo](./02-modelos-binarios/analisis-probit-logit.html)
+📄 [Ver análisis completo](http://rpubs.com/WILLIAM_25/1383742)
 
 ---
 
@@ -81,6 +81,7 @@ Tengo varios análisis econométricos y estadísticos publicados en RPubs:
 | **Indicadores Económicos Argentina** | Múltiples análisis de variables macroeconómicas | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380982) |
 | **Análisis Financiero y Económico** | Estudios cuantitativos adicionales | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1380940) |
 | **Análisis Complementario** | Otros análisis de interés | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1352257) |
+| **Análisis Binarios** | Modelos Probit y Logit | [Ver en RPubs](http://rpubs.com/WILLIAM_25/1383742) |
 
 ---
 
