@@ -81,10 +81,10 @@ library(texreg)      # Tablas de regresión
 
 ## 🔗 Publicación
 
-📄 [Ver análisis completo](link-a-rpubs-o-html)
+📄 [Ver análisis completo](http://rpubs.com/WILLIAM_25/1383742)
 
 ---
 
 **Autor:** William Gutierrez  
-**Curso:** Econometría Aplicada  
+**Curso:** Econometría II  
 **Institución:** Universidad de Los Andes
