@@ -1,190 +1,279 @@
-# 📊 Portafolio de Análisis Econométricos en R
+# 📈 Análisis de Series Temporales: Economía Argentina
 
-[![R](https://img.shields.io/badge/R-276DC3?style=for-the-badge&logo=r&logoColor=white)](https://www.r-project.org/)
-[![RStudio](https://img.shields.io/badge/RStudio-75AADB?style=for-the-badge&logo=RStudio&logoColor=white)](https://www.rstudio.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-
-Colección de análisis econométricos y trabajos desarrollados en R durante mi carrera de Economía en la Universidad de Los Andes (ULA), Venezuela.
-
-## 👨‍💼 Autor
-
-**William Gutierrez**  
-Economista | Analista de Datos | Universidad de Los Andes  
-📧 gutalex2014@gmail.com  
-🔗 [LinkedIn](https://linkedin.com/in/ecoanalisiswill) | [RPubs](https://rpubs.com/WILLIAM_25) | [Portafolio](https://gutalex2014.wixsite.com/portafolio-william-g)
+Análisis econométrico exhaustivo de indicadores económicos argentinos utilizando modelos ARIMA y técnicas de descomposición temporal.
 
 ---
 
-## 📂 Contenido del Repositorio
+## 📂 Contenido del Proyecto
 
-### 🔹 [01 - Series Temporales: Economía Argentina](./01-series-temporales-argentina/)
+### Archivos Principales
 
-Análisis exhaustivo de series económicas argentinas utilizando modelos ARIMA y técnicas de descomposición.
+| Archivo | Descripción | Tipo |
+|---------|-------------|------|
+| `analisis-inflacion-arima-final.Rmd` | Modelo ARIMA completo de inflación mensual | R Markdown |
+| `analisis-inflacion-arima.Rmd` | Versión preliminar del análisis ARIMA | R Markdown |
+| `modelo-deterministico-inflacion.R` | Modelos determinísticos (dicotómico/trigonométrico) | R Script |
+| `modelo-deterministico-tasa-interes.R` | Análisis de tasa de interés efectiva | R Script |
+| `significancia-individual.R` | Pruebas de significancia de parámetros | R Script |
 
-**Proyectos incluidos:**
-- **Modelado ARIMA de Inflación**: Análisis estocástico de la inflación mensual (1970-2025)
-- **Tasa de Interés Efectiva**: Modelos determinísticos y trigonométricos
-- **Pruebas de Estacionariedad**: Test ADF, análisis ACF/PACF
+### Estructura de Carpetas
+
+```
+01-series-temporales-argentina/
+├── README.md (este archivo)
+├── analisis-inflacion-arima-final.Rmd
+├── analisis-inflacion-arima.Rmd
+├── modelo-deterministico-inflacion.R
+├── modelo-deterministico-tasa-interes.R
+├── significancia-individual.R
+├── data/
+│   ├── datos-series-tiempo-argentina.xlsx
+│   └── tasa-interes-efectiva-argentina.xlsx
+└── outputs/
+    ├── graficos/
+    └── resultados/
+```
+
+---
+
+## 🎯 Objetivos del Análisis
+
+1. **Modelar la inflación argentina** (1970-2025) usando metodología Box-Jenkins
+2. **Analizar tasas de interés efectivas** de política monetaria
+3. **Comparar modelos determinísticos vs estocásticos**
+4. **Generar pronósticos** con intervalos de confianza
+5. **Validar supuestos** de los modelos econométricos
+
+---
+
+## 🔬 Metodología
+
+### 1. Análisis ARIMA (Box-Jenkins)
+
+**Pasos implementados:**
+
+**A. Identificación**
+- Visualización de la serie original
+- Prueba de estacionariedad (Test ADF)
+- Análisis de autocorrelaciones (ACF/PACF)
+- Diferenciación de la serie (si es necesario)
+
+**B. Estimación**
+- Selección automática de orden ARIMA(p,d,q)
+- Criterios de información: AIC, BIC
+- Estimación de parámetros por máxima verosimilitud
+
+**C. Validación**
+- Test de Ljung-Box (autocorrelación residual)
+- Test de Shapiro-Wilk (normalidad de residuos)
+- Análisis de residuos estandarizados
+
+**D. Pronóstico**
+- Proyección h periodos adelante
+- Intervalos de confianza al 95%
+
+### 2. Modelos Determinísticos
 
 **Técnicas aplicadas:**
-- Series de Tiempo ARIMA(p,d,q)
-- Descomposición STL (Seasonal-Trend-Loess)
-- Modelos determinísticos (regresión dicotómica y trigonométrica)
-- Pruebas de raíz unitaria (Augmented Dickey-Fuller)
-- Validación de modelos (Ljung-Box, Shapiro-Wilk)
 
-**Herramientas:** `forecast`, `tseries`, `ggplot2`, `TSA`, `lmtest`
+**Descomposición Clásica:**
+- Multiplicativa: Y_t = T_t × S_t × I_t
+- Aditiva: Y_t = T_t + S_t + I_t
 
-📊 **Ver análisis publicados:**
-- [Series ARIMA - RPubs](http://rpubs.com/WILLIAM_25/1380982)
-- [Política Monetaria Argentina - RPubs](http://rpubs.com/WILLIAM_25/1380989)
+**Descomposición STL:**
+- Seasonal-Trend decomposition using Loess
+- Robusta a outliers
 
----
-
-### 🔹 [02 - Pirámides Poblacionales Comparativas](./02-piramides-poblacionales/)
-
-Análisis demográfico y visualización de estructuras etarias en diferentes regiones.
-
-**Regiones analizadas:**
-- Europa del Sur (España, Italia, Grecia)
-- El Caribe (Cuba, República Dominicana, Puerto Rico)
-- El Cáucaso (Georgia, Armenia, Azerbaiyán)
-
-**Técnicas aplicadas:**
-- Visualización de datos demográficos
-- Análisis comparativo de estructuras poblacionales
-- Interpretación de pirámides etarias
-
-**Herramientas:** `ggplot2`, `dplyr`, `tidyr`
-
-📊 **Ver análisis:** [Pirámides Poblacionales - RPubs](http://rpubs.com/WILLIAM_25/1380940)
+**Regresión con Variables Estacionales:**
+- Dicotómica: Variables dummy mensuales
+- Trigonométrica: Funciones seno/coseno
+- Combinaciones de tendencia + estacionalidad
 
 ---
 
-### 🔹 [03 - Otros Análisis Econométricos](./03-otros-analisis/)
+## 📊 Resultados Principales
 
-Proyectos adicionales y análisis exploratorios (en desarrollo).
+### Análisis de Inflación Mensual Argentina
 
----
+**Serie analizada:**
+- Periodo: Julio 1970 - Actualidad
+- Frecuencia: Mensual
+- Observaciones: 600+ datos
 
-## 🛠️ Stack Tecnológico
+**Modelo óptimo seleccionado: ARIMA(5,1,4)**
 
-### Lenguajes y Entornos
-- **R** (4.x): Lenguaje principal
-- **RStudio**: IDE de desarrollo
-- **R Markdown**: Documentación reproducible
-
-### Librerías Principales
-
-**Análisis de Series Temporales:**
-```r
-library(forecast)     # Modelado ARIMA y pronósticos
-library(tseries)      # Tests de estacionariedad
-library(TSA)          # Análisis de series temporales
-library(stl)          # Descomposición STL
+**Prueba de Estacionariedad:**
+```
+Test ADF (serie diferenciada):
+H0: Serie no estacionaria
+p-value < 0.05 → Rechazamos H0
+Conclusión: Serie es estacionaria tras una diferenciación
 ```
 
-**Manipulación y Visualización:**
-```r
-library(tidyverse)    # Ecosistema de análisis de datos
-library(ggplot2)      # Visualización avanzada
-library(dplyr)        # Manipulación de datos
-library(readxl)       # Lectura de archivos Excel
-```
+**Métricas de Ajuste:**
+| Métrica | Valor | Interpretación |
+|---------|-------|----------------|
+| ME | ≈ 0 | Sin sesgo sistemático |
+| RMSE | Bajo | Buen ajuste global |
+| MAE | Bajo | Error absoluto aceptable |
+| MAPE | Alto | Posibles outliers |
+| MASE | < 1 | Mejor que modelo naive |
+| ACF1 | ≈ 0 | Sin autocorrelación residual |
 
-**Análisis Estadístico:**
+**Pronóstico:**
+- Horizonte: 100 meses adelante
+- Intervalo de confianza: 95%
+- Validado con pruebas diagnósticas
+
+### Análisis de Tasa de Interés Efectiva
+
+**Modelos comparados:**
+1. Descomposición multiplicativa/aditiva
+2. Regresión dicotómica (medias estacionales)
+3. Regresión trigonométrica (armónicos)
+4. Modelo sinusoidal completo
+
+**Comparación de MSE/MAE:**
+- Modelo sinusoidal mostró mejor ajuste
+- Criterios AIC/BIC confirman parsimonia
+
+---
+
+## 🛠️ Librerías Utilizadas
+
 ```r
-library(lmtest)       # Tests de modelos lineales
-library(nortest)      # Tests de normalidad
-library(stats)        # Funciones estadísticas base
+# Análisis de series temporales
+library(forecast)      # Modelado ARIMA y pronósticos
+library(tseries)       # Pruebas de estacionariedad
+library(TSA)           # Time Series Analysis
+
+# Visualización
+library(ggplot2)       # Gráficos avanzados
+library(plotly)        # Gráficos interactivos
+
+# Manipulación de datos
+library(readxl)        # Importar archivos Excel
+library(dplyr)         # Transformación de datos
+
+# Pruebas estadísticas
+library(lmtest)        # Tests de modelos lineales
+library(nortest)       # Tests de normalidad
+library(fGarch)        # Modelos GARCH
+library(FinTS)         # Análisis financiero
 ```
 
 ---
 
-## 📖 Metodología de Trabajo
+## 📥 Fuentes de Datos
 
-Todos los análisis en este repositorio siguen un flujo estructurado:
+**Inflación mensual:**
+- Fuente: Instituto Nacional de Estadística y Censos (INDEC)
+- Archivo: `data/datos-series-tiempo-argentina.xlsx`
+- Periodo: 1970-2025
 
-1. **Importación de Datos**: Lectura desde Excel/CSV
-2. **Exploración Inicial**: Visualización y estadísticas descriptivas
-3. **Preparación**: Limpieza y transformación de datos
-4. **Modelado**: Aplicación de técnicas econométricas
-5. **Validación**: Pruebas diagnósticas y estadísticas
-6. **Visualización**: Gráficos profesionales con ggplot2
-7. **Documentación**: Reportes reproducibles en R Markdown
+**Tasa de interés efectiva:**
+- Fuente: Banco Central de la República Argentina (BCRA)
+- Archivo: `data/tasa-interes-efectiva-argentina.xlsx`
+- Frecuencia: Mensual
 
 ---
 
-## 🚀 Cómo Usar Este Repositorio
+## 🚀 Cómo Reproducir el Análisis
 
-### Clonar el repositorio:
-```bash
-git clone https://github.com/alexwill24/Economia-ULA.git
-cd Economia-ULA
-```
-
-### Instalar dependencias:
+### Requisitos previos:
 ```r
-# Instalar todas las librerías necesarias
+# Instalar paquetes necesarios
 install.packages(c(
   "forecast", "tseries", "TSA", "ggplot2", 
-  "dplyr", "readxl", "lmtest", "tidyverse"
+  "readxl", "lmtest", "nortest", "fGarch", 
+  "FinTS", "plotly", "dplyr"
 ))
 ```
 
-### Ejecutar un análisis:
+### Ejecutar análisis ARIMA:
 ```r
-# Ejemplo: Análisis ARIMA de inflación argentina
-setwd("01-series-temporales-argentina")
-source("analisis-inflacion-arima-final.Rmd")
+# Abrir RStudio y ejecutar
+setwd("ruta/a/01-series-temporales-argentina")
+
+# Renderizar el R Markdown
+rmarkdown::render("analisis-inflacion-arima-final.Rmd")
+```
+
+### Ejecutar modelos determinísticos:
+```r
+# En R o RStudio
+source("modelo-deterministico-inflacion.R")
+source("modelo-deterministico-tasa-interes.R")
 ```
 
 ---
 
-## 📊 Proyectos Destacados
+## 📈 Visualizaciones Generadas
 
-### 🏆 Análisis de Inflación Argentina con ARIMA
-- **Periodo:** 1970-2025 (datos mensuales)
-- **Modelo óptimo:** ARIMA(5,1,4) seleccionado por criterios AIC/BIC
-- **Validación:** Pruebas de Ljung-Box y Shapiro-Wilk
-- **Pronóstico:** 100 periodos adelante con IC 95%
+### Gráficos principales:
+1. **Serie original con medias móviles** (7 y 30 periodos)
+2. **Descomposición STL** (Tendencia, Estacionalidad, Residuos)
+3. **ACF y PACF** (series original y diferenciada)
+4. **Pronósticos ARIMA** con bandas de confianza
+5. **Residuos estandarizados** con tests diagnósticos
+6. **Comparación de modelos** determinísticos
 
-**Resultados clave:**
-- Test ADF: Serie estacionaria tras diferenciación (p < 0.05)
-- MAPE: Precisión aceptable con ajuste robusto
-- ACF1 ≈ 0: Sin autocorrelación residual
-
----
-
-## 📚 Recursos Adicionales
-
-- **Tesis de Grado:** [Análisis Cuantitativo ACA Mérida](https://github.com/alexwill24/monografia-analisis-aca-merida)
-- **Publicaciones RPubs:** [Perfil completo](https://rpubs.com/WILLIAM_25)
-- **Portafolio Web:** [Proyectos y CV](https://gutalex2014.wixsite.com/portafolio-william-g)
+Todos los gráficos se generan automáticamente y se guardan en `outputs/graficos/`.
 
 ---
 
-## 📜 Licencia
+## 🔍 Interpretación Económica
 
-Este repositorio está bajo la Licencia MIT. Puedes usar, modificar y distribuir el código citando la fuente original.
+### Inflación Argentina:
+- **Alta volatilidad** histórica confirmada por el análisis
+- **Tendencia creciente** especialmente en últimas décadas
+- **Estacionalidad presente** pero débil
+- **Outliers** asociados a crisis económicas (2001, 2018, 2020)
+
+### Tasa de Interés:
+- **Política monetaria reactiva** ante inflación
+- **Componente estacional moderado**
+- **Cambios estructurales** evidentes en la serie
 
 ---
 
-## 📬 Contacto
+## 📚 Referencias Metodológicas
 
-¿Tienes preguntas o sugerencias sobre algún análisis?
+- Box, G. E., Jenkins, G. M., & Reinsel, G. C. (2015). *Time Series Analysis: Forecasting and Control*
+- Hyndman, R. J., & Athanasopoulos, G. (2018). *Forecasting: Principles and Practice*
+- Cleveland, R. B., et al. (1990). "STL: A Seasonal-Trend Decomposition Procedure Based on Loess"
 
-📧 **Email:** gutalex2014@gmail.com  
-💼 **LinkedIn:** [ecoanalisiswill](https://linkedin.com/in/ecoanalisiswill)  
-🐙 **GitHub:** [@alexwill24](https://github.com/alexwill24)
+---
+
+## 📊 Publicaciones Relacionadas
+
+🔗 **Ver análisis completo en RPubs:**
+- [Series de Tiempo ARIMA](http://rpubs.com/WILLIAM_25/1380982)
+- [Política Monetaria Argentina](http://rpubs.com/WILLIAM_25/1380989)
+
+---
+
+## 🤝 Contribuciones
+
+¿Encontraste un bug o tienes sugerencias para mejorar el análisis?
+
+1. Abre un **Issue** describiendo el problema/sugerencia
+2. Haz un **Fork** del repositorio
+3. Crea una **Pull Request** con tus cambios
+
+---
+
+## 📧 Contacto
+
+**William Gutierrez**  
+Economista | Analista de Datos  
+📧 gutalex2014@gmail.com  
+🔗 [LinkedIn](https://linkedin.com/in/ecoanalisiswill) | [GitHub](https://github.com/alexwill24)
 
 ---
 
 <div align="center">
-  
-**⭐ Si este repositorio te resulta útil, considera darle una estrella**
 
-![GitHub stars](https://img.shields.io/github/stars/alexwill24/Economia-ULA?style=social)
-![GitHub forks](https://img.shields.io/github/forks/alexwill24/Economia-ULA?style=social)
+**← [Volver al repositorio principal](../README.md)**
 
 </div>
